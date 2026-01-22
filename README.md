@@ -1,13 +1,16 @@
-TopicStarter: high concurrency system
-Problem: How to atomically update the database and send messages to a message broker?
-Implementation: Transactional outbox pattern
+#TopicStarter: high concurrency system
 
-Context:
+#Problem: How to atomically update the database and send messages to a message broker?
+
+#Implementation: Transactional outbox pattern
+
+#Context:
+
 A service command typically needs to create/update/delete aggregates in the database and send messages/events to a message broker. 
 For example, a service that participates in a saga needs to update business entities and send messages/events. Similarly, a service that publishes a domain event must update an aggregate and publish an event.
 
 The command must atomically update the database and send messages in order to avoid data inconsistencies and bugs. 
-However, it is not viable to use a traditional distributed transaction (2PC) that spans the database and the message broker The database and/or the message broker might not support 2PC. <img width="1298" height="461" alt="ReliablePublication" src="https://github.com/user-attachments/assets/b5caed8a-23b7-44dc-a4f2-2e4d58152a8b" />
+However, it is not viable to use a traditional distributed transaction (2PC) that spans the database and the message broker The database and/or the message broker might not support 2PC.
 
 And even if they do, it’s often undesirable to couple the service to both the database and the message broker.
 
@@ -23,9 +26,9 @@ This transactions might be performed by the same service instance or by differen
 If the database transaction commits then the messages must be sent. Conversely, if the database rolls back, the messages must not be sent
 Messages must be sent to the message broker in the order they were sent by the service. This ordering must be preserved across multiple service instances that update the same aggregate.
 
-Design:
+#Design:
 The solution is for the service that sends the message to first store the message in the database as part of the transaction that updates the business entities. A separate process then sends the messages to the message broker.
-(Diagramm )
+ <img width="1298" height="461" alt="ReliablePublication" src="https://github.com/user-attachments/assets/b5caed8a-23b7-44dc-a4f2-2e4d58152a8b" />
 
 The participants in this pattern are:
 
@@ -36,7 +39,7 @@ Message relay - sends the messages stored in the outbox to the message broker
 Result context §
 This pattern has the following benefits:
 
-Result context:
+#Result context:
 
 2PC is not used
 Messages are guaranteed to be sent if and only if the database transaction commits
